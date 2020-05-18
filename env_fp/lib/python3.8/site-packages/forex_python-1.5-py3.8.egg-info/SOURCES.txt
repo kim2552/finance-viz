@@ -1,0 +1,14 @@
+MANIFEST.in
+README.rst
+setup.cfg
+setup.py
+docs/__init__.py
+forex_python/__init__.py
+forex_python/bitcoin.py
+forex_python/converter.py
+forex_python.egg-info/PKG-INFO
+forex_python.egg-info/SOURCES.txt
+forex_python.egg-info/dependency_links.txt
+forex_python.egg-info/requires.txt
+forex_python.egg-info/top_level.txt
+forex_python/raw_data/currencies.json
