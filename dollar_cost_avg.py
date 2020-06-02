@@ -4,6 +4,7 @@ import pandas as pd
 import yfinance as yf
 import yahoofinancials
 from yahoofinancials import YahooFinancials
+import datetime
 
 '''
 FinancePy
@@ -14,30 +15,62 @@ Parameters:
     The investment amount at each period.
 '''
 
-START_DATE = '2015-05-31'
-END_DATE = '2020-05-31'
-PERIOD = 'monthly'
+# Default dates 
+start_year = 2010
+start_month = 10
+start_day = 1
+end_year = 2019
+end_month = 10
+end_day = 1
 
-c = CurrencyRates()
-
-def getInfo(ticker):
+def getInfoBiWeekly(ticker,start_dt,end_dt):
     yahoo_financials = YahooFinancials(ticker)
     my_investment = 0
 
-    data = yahoo_financials.get_historical_price_data(start_date=START_DATE,
-                                                      end_date=END_DATE,
-                                                      time_interval=PERIOD)
+    print("Investment Type: Bi-Weekly")
+    print("Range of investment date",start_dt," to ",end_dt)
+    data = yahoo_financials.get_historical_price_data(start_date=start_dt,
+                                                      end_date=end_dt,
+                                                      time_interval='weekly')
+    print("Ticker is: ", ticker)
+    counter = 0
+    count=0
+    total=0
+    final=0
+    index=0
+    for i in data[ticker].get('prices'):
+        if not(index%2):
+            my_investment += 500
+            count+=1
+            avg=( (i.get('high')+i.get('low')) / 2)
+            total+=avg
+            final=avg
+        index+=1
+
+    dca = total/count
+    print("\tCurrent price = $",final)
+    print("\tDollar cost avg = $",'%.2f'%dca)
+    print("\tNumber of payments = ",count)
+    print("\tMy invested amount = $",my_investment)
+    print("\tMy return percentage = ",'%.2f'%(((final-dca)/dca)*100),"%")
+    print("\tMy return rate = $",'%.2f'%(my_investment*((final-dca)/dca)))
+
+def getInfoMonthly(ticker,start_dt,end_dt):
+    yahoo_financials = YahooFinancials(ticker)
+    my_investment = 0
+
+    print("Investmenet Type: Monthly")
+    print("Range of investment date",start_dt," to ",end_dt)
+    data = yahoo_financials.get_historical_price_data(start_date=start_dt,
+                                                      end_date=end_dt,
+                                                      time_interval='monthly')
     print("Ticker is: ", ticker)
     counter = 0
     count=0
     total=0
     final=0
     for i in data[ticker].get('prices'):
-        if(counter < 18):
-            my_investment += 1000
-            counter+=1
-        else:
-            my_investment += 500
+        my_investment += 500
         count+=1
         avg=( (i.get('high')+i.get('low')) / 2)
         total+=avg
@@ -46,20 +79,23 @@ def getInfo(ticker):
     dca = total/count
     print("\tCurrent price = $",final)
     print("\tDollar cost avg = $",'%.2f'%dca)
+    print("\tNumber of payments = ",count)
     print("\tMy invested amount = $",my_investment)
-    print("\tMy return percentage = ",'%.2f'%((final-dca)/dca),"%")
+    print("\tMy return percentage = ",'%.2f'%(((final-dca)/dca)*100),"%")
     print("\tMy return rate = $",'%.2f'%(my_investment*((final-dca)/dca)))
 
-getInfo('VOO')
-getInfo('DIA')
-getInfo('VFV.TO')
-getInfo('XIC.TO')
-getInfo('AAPL')
-getInfo('MSFT')
-getInfo('AMZN')
-getInfo('GOOGL')
-getInfo('GM')
-getInfo('MG.TO')
-getInfo('ENB.TO')
-getInfo('BMO.TO')
-getInfo('BNS.TO')
+t = input("Enter ticker symbol: ")
+start_date = input("Enter start date (Y-m-d): ")
+end_date = input("Enter end date (Y-m-d): ")
+
+for i in range(1):
+    if(not(start_date) or not(end_date)):
+        ds = datetime.date(start_year,start_month,start_day).strftime("%Y-%m-%d")
+        de = datetime.date(end_year,start_month,start_day).strftime("%Y-%m-%d")
+    else:
+        ds = start_date
+        de = end_date
+    if(not(t)):
+        t = "VFV.TO"
+    getInfoBiWeekly(t,ds,de)
+    getInfoMonthly(t,ds,de)
