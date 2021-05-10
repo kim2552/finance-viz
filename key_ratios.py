@@ -19,6 +19,8 @@ apple_url='https://financials.morningstar.com/ratios/r.html?t=AAPL#tab-profitabi
 gm_url='https://financials.morningstar.com/ratios/r.html?t=GM#tab-profitability'
 enb_url='https://financials.morningstar.com/ratios/r.html?t=ENB#tab-profitability'
 mg_url='https://financials.morningstar.com/ratios/r.html?t=MGA#tab-profitability'
+global_url ='https://financials.morningstar.com/ratios/r.html?t='
+gloabl_uri ='#tab-profitability'
 
 c = CurrencyRates()
 
@@ -60,18 +62,22 @@ def displayRatios(html,sign):
         for i, th in enumerate(p.select('th')):
             if(th.text=='Book Value Per Share * USD'):
                 for j, td in enumerate(p.select('td')):
-                    book_value_TTM = float(td.text)
+                    if(td.text != '—'):
+                        book_value_TTM = float(td.text)
             if(th.text=='Book Value Per Share * CAD'):
                 for j, td in enumerate(p.select('td')):
-                    book_value_TTM = float(td.text)
-                    bv_curr=1
+                    if(td.text != '—'):
+                        book_value_TTM = float(td.text)
+                        bv_curr=1
             if(th.text=='Earnings Per Share USD'):
                 for j, td in enumerate(p.select('td')):
-                    pe.append(float(td.text))
+                    if(td.text != '—'):
+                        pe.append(float(td.text))
             if(th.text=='Earnings Per Share CAD'):
                 for j, td in enumerate(p.select('td')):
-                    pe.append(float(td.text))
-                    pe_curr=1
+                    if(td.text != '—'):
+                        pe.append(float(td.text))
+                        pe_curr=1
             if(th.text=='Return on Invested Capital %'):
                 for j, td in enumerate(p.select('td')):
                     if(bool(re.search(r'\d', td.text))):
@@ -120,7 +126,8 @@ def getStockPrice(ticker):
     price = data.info.get("regularMarketOpen","")
     return price
 
-def run_Analysis(comp, url,ticker):
+def run_Analysis(comp,ticker):
+    url = global_url+ticker+gloabl_uri
     print("ANALYSIS FOR "+comp)
     raw_html = simple_get(url)
     soup = BeautifulSoup(raw_html,"html.parser")
@@ -136,7 +143,9 @@ def run_Analysis(comp, url,ticker):
 
 
 if __name__=='__main__':
-    run_Analysis("APPLE INC.", apple_url,'AAPL')
-    run_Analysis("GENERAL MOTORS",gm_url,'GM')
-    run_Analysis("ENBRIDGE",enb_url,'ENB.TO')
-    run_Analysis("MAGNA INTERNATIONAL",mg_url,'MG.TO')
+    t = input("Enter ticker symbol: ")
+    run_Analysis(t,t)
+    # run_Analysis("APPLE INC.",'AAPL')
+    # run_Analysis("GENERAL MOTORS",'GM')
+    # run_Analysis("ENBRIDGE",'ENB.TO')
+    # run_Analysis("MAGNA INTERNATIONAL",'MG.TO')
