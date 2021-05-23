@@ -24,13 +24,12 @@ class DCAWindow:
         self.end_date = StringVar()
         self.end_date.set("2020-01-01")
 
+        self.data_array = []
+        self.colors = ['b','g','r','c','m','y','k','w']
+
         self.set_up_grid_layout()
         self.set_up_inputs()
-        # self.update_plot()
-
-        self.data_array = []
-
-        self.colors = ['b','g','r','c','m','y','k','w']
+        self.update_plot()
 
 
     # Setup layout in window
@@ -96,7 +95,7 @@ class DCAWindow:
         toolbar.grid(row=2,column=0,padx=5,pady=5,sticky='nswe')
 
     def clear_enteries(self):
-        print(1)
+        self.data_array = []
 
 
 if __name__ == "__main__":
