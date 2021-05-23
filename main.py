@@ -1,0 +1,100 @@
+##  main.py
+#   description: main function of program
+#           contains the GUI and several
+#           tabs for different features
+#   author: David Kim
+#   last modified: 2021-05-16
+
+from tkinter import *
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
+NavigationToolbar2Tk)
+import dollar_cost_avg
+
+class DCAWindow:
+    def __init__(self):
+        self.window = Tk()
+        self.window.title('Dollar Cost Average Visualizer')
+        self.window.geometry("1280x800")
+
+        self.ticker = StringVar()
+        self.start_date = StringVar()
+        self.end_date = StringVar()
+
+        self.set_up_grid_layout()
+        self.set_up_inputs()
+        # self.update_plot()
+
+        self.data_array = []
+
+        self.colors = ['b','g','r','c','m','y','k','w']
+
+
+    # Setup layout in window
+    # left frame: contains the plot
+    # right frame: contains inputs and buttons
+    def set_up_grid_layout(self):
+        self.left_frame = Frame(self.window, width=840, height= 780, bg='grey')
+        self.left_frame.grid(row=0, column=0, padx=5, pady=5)
+        self.left_frame.grid_propagate(0)
+
+        self.right_frame = Frame(self.window, width=420, height=780, bg='grey')
+        self.right_frame.grid(row=0, column=1, padx=5, pady=5)
+        self.right_frame.grid_propagate(0)
+
+    def set_up_inputs(self):
+        label1 = Label(self.right_frame, text = "Enter a ticker symbol:")
+        label1.grid(column = 0, row = 1)
+        nameEntered = Entry(self.right_frame, width = 15, textvariable = self.ticker)
+        nameEntered.grid(column = 0, row = 2,padx=5,pady=5)
+
+        label2 = Label(self.right_frame, text = "Enter a start date (yyyy-mm-dd):")
+        label2.grid(column = 0, row = 3)
+        startDateEntered = Entry(self.right_frame, width = 15, textvariable = self.start_date)
+        startDateEntered.grid(column = 0, row = 4,padx=5,pady=5)
+
+        label3 = Label(self.right_frame, text = "Enter a end date (yyyy-mm-dd):")
+        label3.grid(column = 1, row = 3)
+        endDateEntered = Entry(self.right_frame, width = 15, textvariable = self.end_date)
+        endDateEntered.grid(column = 1, row = 4,padx=5,pady=5)
+
+        # button that displays the plot
+        plot_button = Button(master = self.right_frame, command = self.update_plot,height = 2, width = 10,text = "Plot")
+        plot_button.grid(column=0,row=5,padx=5,pady=5, sticky='nswe')
+
+        clear_button = Button(master = self.right_frame, command = self.clear_enteries,height = 2, width = 10,text = "Clear Enteries")
+        clear_button.grid(column=0,row=6,padx=5,pady=5, sticky='nswe')
+
+    # plotting the graph in frame
+    def update_plot(self):
+        package = dollar_cost_avg.getInfoMonthly(self.ticker.get(),self.start_date.get(),self.end_date.get())
+        self.data_array.append(package)
+
+        package = dollar_cost_avg.getInfoBiWeekly(self.ticker.get(),self.start_date.get(),self.end_date.get())
+        self.data_array.append(package)
+        
+        # the figure that will contain the plot
+        fig1 = Figure(figsize = (5, 5),dpi = 100)
+        plt1 = fig1.add_subplot(111)
+    
+        line = FigureCanvasTkAgg(fig1, self.left_frame)
+        line.get_tk_widget().grid(row=1,column=0,padx=5,pady=5, sticky='nswe')
+
+        color_counter = 0
+        for d in self.data_array:
+            amounts = d[0]
+            dates = d[1]
+            name = d[2]
+            plt1.plot(dates,amounts,color=self.colors[color_counter],marker='o',label=name)
+            color_counter += 1
+
+        plt1.legend()
+        plt1.set_title('Date vs Total Amount')
+
+    def clear_enteries(self):
+        print(1)
+
+
+if __name__ == "__main__":
+    dca_window = DCAWindow()
+    dca_window.window.mainloop()

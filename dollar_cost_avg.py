@@ -26,7 +26,6 @@ end_month = 10
 end_day = 1
 
 colors =['blue','red','green','orange']
-counter = 0
 
 def getInfoBiWeekly(ticker,start_dt,end_dt):
     yahoo_financials = YahooFinancials(ticker)
@@ -38,18 +37,31 @@ def getInfoBiWeekly(ticker,start_dt,end_dt):
                                                       end_date=end_dt,
                                                       time_interval='weekly')
     print("Ticker is: ", ticker)
-    counter = 0
     count=0
     total=0
     final=0
     index=0
+
+    date_list = []
+    total_list = []
+    dates = np.array(date_list)
+    totals = np.array(total_list)
+    total_shares = 0
     for i in data[ticker].get('prices'):
         if not(index%2):
-            my_investment += 500
+            my_investment += 250
             count+=1
             avg=( (i.get('high')+i.get('low')) / 2)
             total+=avg
             final=avg
+
+            num_shares =250/avg
+            total_shares+=num_shares
+            current_equity = total_shares*avg
+
+            dates = np.append(dates, i.get('date'))
+            totals = np.append(totals, current_equity)
+
         index+=1
 
     dca = total/count
@@ -60,8 +72,10 @@ def getInfoBiWeekly(ticker,start_dt,end_dt):
     print("\tMy return percentage = ",'%.2f'%(((final-dca)/dca)*100),"%")
     print("\tMy return rate = $",'%.2f'%(my_investment*((final-dca)/dca)))
 
-def getInfoMonthly(ticker,start_dt,end_dt,ax):
-    global counter
+    package = [totals, dates, ticker+"_biweekly"]
+    return package
+
+def getInfoMonthly(ticker,start_dt,end_dt):
     yahoo_financials = YahooFinancials(ticker)
     my_investment = 0
 
@@ -71,7 +85,6 @@ def getInfoMonthly(ticker,start_dt,end_dt,ax):
                                                       end_date=end_dt,
                                                       time_interval='monthly')
     print("Ticker is: ", ticker)
-    counter = 0
     count=0
     total=0
     final=0
@@ -80,7 +93,6 @@ def getInfoMonthly(ticker,start_dt,end_dt,ax):
     total_list = []
     dates = np.array(date_list)
     totals = np.array(total_list)
-    print(data)
     total_shares = 0
     for i in data[ticker].get('prices'):
         my_investment += 500
@@ -95,9 +107,6 @@ def getInfoMonthly(ticker,start_dt,end_dt,ax):
         dates = np.append(dates, i.get('date'))
         totals = np.append(totals, current_equity)
 
-    ax.plot(dates, totals, color=colors[counter])
-    counter +=1
-
     dca = total/count
     print("\tCurrent price = $",final)
     print("\tDollar cost avg = $",'%.2f'%dca)
@@ -106,26 +115,5 @@ def getInfoMonthly(ticker,start_dt,end_dt,ax):
     print("\tMy return percentage = ",'%.2f'%(((final-dca)/dca)*100),"%")
     print("\tMy return rate = $",'%.2f'%(my_investment*((final-dca)/dca)))
 
-fig, ax = plt.subplots()
-while(True):
-    t = input("Enter ticker symbol: ")
-    start_date = input("Enter start date (Y-m-d): ")
-    end_date = input("Enter end date (Y-m-d): ")
-
-    for i in range(1):
-        if(not(start_date) or not(end_date)):
-            ds = datetime.date(start_year,start_month,start_day).strftime("%Y-%m-%d")
-            de = datetime.date(end_year,start_month,start_day).strftime("%Y-%m-%d")
-        else:
-            ds = start_date
-            de = end_date
-        if(not(t)):
-            t = "VFV.TO"
-        # getInfoBiWeekly(t,ds,de)
-        getInfoMonthly(t,ds,de,ax)
-
-    ax.set(xlabel='Time (s)', ylabel='Total ($)',
-       title='Investment Total by Time')
-    ax.grid()
-
-    fig.savefig("investment.png")
+    package = [totals, dates, ticker+"_monthly"]
+    return package
