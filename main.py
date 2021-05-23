@@ -15,11 +15,14 @@ class DCAWindow:
     def __init__(self):
         self.window = Tk()
         self.window.title('Dollar Cost Average Visualizer')
-        self.window.geometry("1280x800")
+        self.window.geometry("950x700")
 
         self.ticker = StringVar()
+        self.ticker.set("VFV.TO")
         self.start_date = StringVar()
+        self.start_date.set("2015-01-01")
         self.end_date = StringVar()
+        self.end_date.set("2020-01-01")
 
         self.set_up_grid_layout()
         self.set_up_inputs()
@@ -34,11 +37,11 @@ class DCAWindow:
     # left frame: contains the plot
     # right frame: contains inputs and buttons
     def set_up_grid_layout(self):
-        self.left_frame = Frame(self.window, width=840, height= 780, bg='grey')
+        self.left_frame = Frame(self.window, width=510, height= 680, bg='grey')
         self.left_frame.grid(row=0, column=0, padx=5, pady=5)
         self.left_frame.grid_propagate(0)
 
-        self.right_frame = Frame(self.window, width=420, height=780, bg='grey')
+        self.right_frame = Frame(self.window, width=400, height=680, bg='grey')
         self.right_frame.grid(row=0, column=1, padx=5, pady=5)
         self.right_frame.grid_propagate(0)
 
@@ -69,9 +72,6 @@ class DCAWindow:
     def update_plot(self):
         package = dollar_cost_avg.getInfoMonthly(self.ticker.get(),self.start_date.get(),self.end_date.get())
         self.data_array.append(package)
-
-        package = dollar_cost_avg.getInfoBiWeekly(self.ticker.get(),self.start_date.get(),self.end_date.get())
-        self.data_array.append(package)
         
         # the figure that will contain the plot
         fig1 = Figure(figsize = (5, 5),dpi = 100)
@@ -86,10 +86,14 @@ class DCAWindow:
             dates = d[1]
             name = d[2]
             plt1.plot(dates,amounts,color=self.colors[color_counter],marker='o',label=name)
+            plt1.set_xticks([dates[0],dates[int((len(dates)-1)/3)],dates[int(2*(len(dates)-1)/3)],dates[len(dates)-1]])
             color_counter += 1
 
         plt1.legend()
         plt1.set_title('Date vs Total Amount')
+
+        toolbar = NavigationToolbar2Tk(line, self.left_frame)
+        toolbar.grid(row=2,column=0,padx=5,pady=5,sticky='nswe')
 
     def clear_enteries(self):
         print(1)

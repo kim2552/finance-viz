@@ -104,7 +104,7 @@ def getInfoMonthly(ticker,start_dt,end_dt):
         total_shares+=num_shares
         current_equity = total_shares*avg
 
-        dates = np.append(dates, i.get('date'))
+        dates = np.append(dates, i.get('formatted_date'))
         totals = np.append(totals, current_equity)
 
     dca = total/count
