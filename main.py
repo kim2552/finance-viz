@@ -6,6 +6,7 @@
 #   last modified: 2021-05-16
 
 from tkinter import *
+from tkinter import ttk
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
 NavigationToolbar2Tk)
@@ -17,6 +18,16 @@ class DCAWindow:
         self.window.title('Dollar Cost Average Visualizer')
         self.window.geometry("950x700")
 
+        tabControl = ttk.Notebook(self.window)
+        self.dca_tab = ttk.Frame(tabControl)
+        self.ftw_tab = ttk.Frame(tabControl)
+        self.kr_tab = ttk.Frame(tabControl)
+
+        tabControl.add(self.dca_tab, text ='dollar cost averaging')
+        tabControl.add(self.ftw_tab, text ='fifty two week average')
+        tabControl.add(self.kr_tab, text ='key ratios')
+        tabControl.pack(expand = 1, fill ="both")
+
         self.ticker = StringVar()
         self.ticker.set("VFV.TO")
         self.start_date = StringVar()
@@ -27,24 +38,24 @@ class DCAWindow:
         self.data_array = []
         self.colors = ['b','g','r','c','m','y','k','w']
 
-        self.set_up_grid_layout()
-        self.set_up_inputs()
+        self.set_up_grid_layout_dca()
+        self.set_up_inputs_dca()
         self.update_plot()
 
 
     # Setup layout in window
     # left frame: contains the plot
     # right frame: contains inputs and buttons
-    def set_up_grid_layout(self):
-        self.left_frame = Frame(self.window, width=510, height= 680, bg='grey')
+    def set_up_grid_layout_dca(self):
+        self.left_frame = Frame(self.dca_tab, width=510, height= 680, bg='grey')
         self.left_frame.grid(row=0, column=0, padx=5, pady=5)
         self.left_frame.grid_propagate(0)
 
-        self.right_frame = Frame(self.window, width=400, height=680, bg='grey')
+        self.right_frame = Frame(self.dca_tab, width=400, height=680, bg='grey')
         self.right_frame.grid(row=0, column=1, padx=5, pady=5)
         self.right_frame.grid_propagate(0)
 
-    def set_up_inputs(self):
+    def set_up_inputs_dca(self):
         label1 = Label(self.right_frame, text = "Enter a ticker symbol:")
         label1.grid(column = 0, row = 1)
         nameEntered = Entry(self.right_frame, width = 15, textvariable = self.ticker)
@@ -69,8 +80,16 @@ class DCAWindow:
 
     # plotting the graph in frame
     def update_plot(self):
-        package = dollar_cost_avg.getInfoMonthly(self.ticker.get(),self.start_date.get(),self.end_date.get())
-        self.data_array.append(package)
+
+        analyz_flag = 0                      #Check if the ticker has already been analyzed
+        for p in self.data_array:
+            if self.ticker.get() == p[2]:
+                analyz_flag = 1
+
+        if not analyz_flag:                  #If ticker has not been anaylzed then analyze it
+            package = dollar_cost_avg.getInfoMonthly(self.ticker.get(),self.start_date.get(),self.end_date.get())
+            if package is not None:
+                self.data_array.append(package)
         
         # the figure that will contain the plot
         fig1 = Figure(figsize = (5, 5),dpi = 100)
