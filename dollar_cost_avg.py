@@ -36,6 +36,11 @@ def getInfoBiWeekly(ticker,start_dt,end_dt):
     data = yahoo_financials.get_historical_price_data(start_date=start_dt,
                                                       end_date=end_dt,
                                                       time_interval='weekly')
+
+    if data[ticker]['eventsData'] == {}:
+        print("Could not find any data for "+ticker)
+        return None
+
     print("Ticker is: ", ticker)
     count=0
     total=0
@@ -72,7 +77,7 @@ def getInfoBiWeekly(ticker,start_dt,end_dt):
     print("\tMy return percentage = ",'%.2f'%(((final-dca)/dca)*100),"%")
     print("\tMy return rate = $",'%.2f'%(my_investment*((final-dca)/dca)))
 
-    package = [totals, dates, ticker+"_biweekly"]
+    package = [totals, dates, ticker]
     return package
 
 def getInfoMonthly(ticker,start_dt,end_dt):
@@ -84,6 +89,11 @@ def getInfoMonthly(ticker,start_dt,end_dt):
     data = yahoo_financials.get_historical_price_data(start_date=start_dt,
                                                       end_date=end_dt,
                                                       time_interval='monthly')
+
+    if data[ticker]['eventsData'] == {}:
+        print("Could not find any data for "+ticker)
+        return None
+
     print("Ticker is: ", ticker)
     count=0
     total=0
@@ -115,5 +125,5 @@ def getInfoMonthly(ticker,start_dt,end_dt):
     print("\tMy return percentage = ",'%.2f'%(((final-dca)/dca)*100),"%")
     print("\tMy return rate = $",'%.2f'%(my_investment*((final-dca)/dca)))
 
-    package = [totals, dates, ticker+"_monthly"]
+    package = [totals, dates, ticker]
     return package
